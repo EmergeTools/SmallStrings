@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'SmallStrings'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'A minifier for localized .strings files'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.authors          = 'Emerge Tools'
@@ -8,6 +8,7 @@ Pod::Spec.new do |s|
   s.homepage = 'https://www.emergetools.com/'
 
   ios_deployment_target = '11.0'
+  macos_deployment_target = '12.0'
 
   s.source_files = [
     'Source/*.{m,h}',
@@ -15,6 +16,8 @@ Pod::Spec.new do |s|
 
   s.preserve_paths = [
     'compress',
+    'localize.rb',
+    'localize.sh',
   ]
 
   # Ensure the run script and upload-symbols are callable via
