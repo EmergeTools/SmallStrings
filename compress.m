@@ -1,10 +1,3 @@
-//
-//  compress.c
-//  buildo
-//
-//  Created by Michael Eisel on 10/20/21.
-//
-
 #include <compression.h>
 #include <Foundation/Foundation.h>
 
