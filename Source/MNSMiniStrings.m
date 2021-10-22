@@ -14,33 +14,23 @@ static NSDictionary <NSString *, NSString *> *sKeyToString = nil;
     uint64_t outSize = 0;
     memcpy(&outSize, buffer, sizeof(outSize));
     uint8_t *outBuffer = (uint8_t *)malloc(outSize);
+    // Although doing this compression may seem time-consuming, in reality it seems to only take a small fraction of overall time for this whole process
     size_t actualSize = compression_decode_buffer(outBuffer, outSize, buffer + sizeof(outSize), compressedData.length - sizeof(outSize), NULL, COMPRESSION_LZFSE);
     return [NSData dataWithBytesNoCopy:outBuffer length:actualSize freeWhenDone:YES];
 }
 
 + (id)_jsonForName:(NSString *)name
 {
-    NSURL *documentsDirectory = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
-    NSURL *cacheDirectory = [documentsDirectory URLByAppendingPathComponent:@"emerge-cache/localization"];
-    NSURL *cacheFile = [[cacheDirectory URLByAppendingPathComponent:name] URLByDeletingPathExtension]; // Remove .lzfse
-    NSData *cacheData = nil;
-    if (![[NSFileManager defaultManager] fileExistsAtPath:cacheFile.path]) {
-        // Pull the compressed version from the bundle and write out
-        [[NSFileManager defaultManager] createDirectoryAtURL:cacheDirectory withIntermediateDirectories:YES attributes:nil error:nil];
-        NSURL *compressedFile = [[NSBundle mainBundle] URLForResource:name withExtension:nil subdirectory:@"localization"];
-        cacheData = [self _decompressedDataForFile:compressedFile];
-        [cacheData writeToURL:cacheFile atomically:YES];
-    } else {
-        cacheData = [NSData dataWithContentsOfURL:cacheFile options:NSDataReadingMapped error:nil];
-    }
-    return [NSJSONSerialization JSONObjectWithData:cacheData options:0 error:nil];
+    NSURL *compressedFile = [[NSBundle mainBundle] URLForResource:name withExtension:nil subdirectory:@"localization"];
+    NSData *data = [self _decompressedDataForFile:compressedFile];
+    return [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 }
 
 + (NSDictionary <NSString *, NSString *> *)_createKeyToString
 {
     // Note that the preferred list does seem to at least include the development region as a fallback if there aren't
     // any other languages
-    NSString *bestLocalization = [[[NSBundle mainBundle] preferredLocalizations] firstObject];
+    NSString *bestLocalization = [[[NSBundle mainBundle] preferredLocalizations] firstObject] ?: [[NSBundle mainBundle] developmentLocalization];
     if (!bestLocalization) {
         return @{};
     }
