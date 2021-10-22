@@ -37,8 +37,7 @@ def write_compressed(out, str)
   Tempfile.create('localization_values') do |file|
     file.write(str)
     file.close
-    sh("/Users/meisel/Library/Developer/Xcode/DerivedData/buildo-dwqiyznkrgywrwdeidhbstleyeug/Build/Products/Debug/buildo #{file.path} #{out}")
-    # sh("/Users/meisel/projects/buildo/compress #{file.path} #{out}")
+    sh("./compress #{file.path} #{out}")
   end
 end
 
@@ -46,6 +45,5 @@ write_compressed("#{out_dir}/keys.json.lzfse", keys.to_json)
 
 lang_to_map.each do |lang, map|
   values = keys.map { |key| map[key] }
-  puts "#{out_dir}/#{lang}.values.json.lzfse"
   write_compressed("#{out_dir}/#{lang}.values.json.lzfse", values.to_json)
 end
