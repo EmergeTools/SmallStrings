@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'SmallStrings'
-  s.version          = '0.1.1'
+  s.version          = '0.1.2'
   s.summary          = 'A minifier for localized .strings files'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.authors          = 'Emerge Tools'
