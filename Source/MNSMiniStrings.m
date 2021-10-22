@@ -28,7 +28,7 @@ static NSDictionary <NSString *, NSString *> *sKeyToString = nil;
         // Pull the compressed version from the bundle and write out
         [[NSFileManager defaultManager] createDirectoryAtURL:cacheDirectory withIntermediateDirectories:YES attributes:nil error:nil];
         NSURL *compressedFile = [[NSBundle mainBundle] URLForResource:name withExtension:nil subdirectory:@"localization"];
-        NSData *cacheData = [self _decompressedDataForFile:compressedFile];
+        cacheData = [self _decompressedDataForFile:compressedFile];
         [cacheData writeToURL:cacheFile atomically:YES];
     } else {
         cacheData = [NSData dataWithContentsOfURL:cacheFile options:NSDataReadingMapped error:nil];
