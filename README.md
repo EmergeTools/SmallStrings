@@ -4,7 +4,7 @@
 ### How it works
 
 The library consists of two main components:
-- A tool that converts the .strings files (of the form App.app/\*.lproj/Localizable.strings) into a minified form as a build step. First, this tool eliminates key duplication by following the strategy from https://eisel.me/signing. This reduces the size by roughly 50%. Then, it keeps all these small files in a compressed form on disk, using LZFSE, reducing the size further. It also replaces the original langage.lproj/Localizable.strings with placeholders that have one key-value pair each. This shows Apple that the same languages are still supported, so that it can pick correct one based on the user's settings.
+- A tool that converts the .strings files (of the form App.app/\*.lproj/Localizable.strings) into a minified form as a build step. First, this tool eliminates key duplication by following the strategy from https://eisel.me/localization. This reduces the size by roughly 50%. Then, it keeps all these small files in a compressed form on disk, using LZFSE, reducing the size further. It also replaces the original language.lproj/Localizable.strings with placeholders that have one key-value pair each. This shows Apple that the same languages are still supported, so that it can pick the correct one based on the user's settings.
 - An iOS library that replaces `NSLocalizedString` with a new version, `SSTStringForKey` that fetches values for keys from this minified format.
 
 ### Usage
