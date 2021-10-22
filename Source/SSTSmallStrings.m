@@ -1,11 +1,9 @@
-#import "MNSMiniStrings.h"
+#import "SSTSmallStrings.h"
 #import <compression.h>
-
-@implementation MNSMiniStrings
 
 static NSDictionary <NSString *, NSString *> *sKeyToString = nil;
 
-+ (NSData *)_decompressedDataForFile:(NSURL *)file
+NSData * SSTDecompressedDataForFile(NSURL *file)
 {
     // The file format is: |-- 8 bytes for length of uncompressed data --|-- compressed LZFSE data --|
     NS_VALID_UNTIL_END_OF_SCOPE NSData *compressedData = [NSData dataWithContentsOfURL:file options:NSDataReadingMappedIfSafe error:nil];
@@ -19,14 +17,14 @@ static NSDictionary <NSString *, NSString *> *sKeyToString = nil;
     return [NSData dataWithBytesNoCopy:outBuffer length:actualSize freeWhenDone:YES];
 }
 
-+ (id)_jsonForName:(NSString *)name
+id SSTJsonForName(NSString *name)
 {
     NSURL *compressedFile = [[NSBundle mainBundle] URLForResource:name withExtension:nil subdirectory:@"localization"];
-    NSData *data = [self _decompressedDataForFile:compressedFile];
+    NSData *data = SSTDecompressedDataForFile(compressedFile);
     return [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 }
 
-+ (NSDictionary <NSString *, NSString *> *)_createKeyToString
+NSDictionary <NSString *, NSString *> *SSTCreateKeyToString()
 {
     // Note that the preferred list does seem to at least include the development region as a fallback if there aren't
     // any other languages
@@ -35,9 +33,9 @@ static NSDictionary <NSString *, NSString *> *sKeyToString = nil;
         return @{};
     }
     NSString *valuesPath = [NSString stringWithFormat:@"%@.values.json.lzfse", bestLocalization];
-    NSArray <id> *values = [self _jsonForName:valuesPath];
+    NSArray <id> *values = SSTJsonForName(valuesPath);
 
-    NSArray <NSString *> *keys = [self _jsonForName:@"keys.json.lzfse"];
+    NSArray <NSString *> *keys = SSTJsonForName(@"keys.json.lzfse");
 
     NSMutableDictionary <NSString *, NSString *> *keyToString = [NSMutableDictionary dictionaryWithCapacity:keys.count];
     NSInteger count = keys.count;
@@ -52,15 +50,13 @@ static NSDictionary <NSString *, NSString *> *sKeyToString = nil;
     return keyToString; // Avoid -copy to be a bit faster
 }
 
-+ (NSString *)stringForKey:(NSString *)key
+NSString *SSTStringForKey(NSString *key)
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sKeyToString = [self _createKeyToString];
+        sKeyToString = SSTCreateKeyToString();
     });
     // Haven't tested with CFBundleAllowMixedLocalizations set to YES, although it seems like that'd be handled by the
     // NSLocalizedString fallback
     return sKeyToString[key] ?: NSLocalizedString(key, @"");
 }
-
-@end
