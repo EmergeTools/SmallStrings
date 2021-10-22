@@ -1,14 +1,13 @@
 Pod::Spec.new do |s|
   s.name             = 'SmallStrings'
-  s.version          = '0.1.2'
+  s.version          = '0.1.3'
   s.summary          = 'A minifier for localized .strings files'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.authors          = 'Emerge Tools'
   s.source = {:git => 'https://github.com/EmergeTools/SmallStrings'}
   s.homepage = 'https://www.emergetools.com/'
 
-  ios_deployment_target = '11.0'
-  macos_deployment_target = '12.0'
+  s.ios_deployment_target = '11.0'
 
   s.source_files = [
     'Source/*.{m,h}',
