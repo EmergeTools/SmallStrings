@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.source = {:git => 'https://github.com/EmergeTools/SmallStrings'}
   s.homepage = 'https://www.emergetools.com/'
 
-  s.ios_deployment_target = '11.0'
+  s.ios.deployment_target = '11.0'
 
   s.source_files = [
     'Source/*.{m,h}',
