@@ -29,4 +29,7 @@ Lastly, replace all usages of `NSLocalizedString(key, comment)` with `SSTStringF
 
 #### Manual
 
-Add `Source/SSTSmallStrings.{h,m}` to your project. Create a `compress` binary via `clang -O3 compress.m -framework Foundation -lcompression -o compress` and put the executable in the same directory as `localize.{rb,sh}`. Add a build step with `cd /path/to/SmallStrings && ./localize.sh ${CODESIGNING_FOLDER_PATH} ${DERIVED_FILES_DIR}/SmallStrings.cache`. Lastly, replace all usages of `NSLocalizedString(key, comment)` with `SSTStringForKey(key)`.
+- Add `Source/SSTSmallStrings.{h,m}` to your project.
+- Create a `compress` binary via `clang -O3 compress.m -framework Foundation -lcompression -o compress` and put the executable in the same directory as `localize.{rb,sh}`.
+- Add a build step with `cd /path/to/SmallStrings && ./localize.sh ${CODESIGNING_FOLDER_PATH} ${DERIVED_FILES_DIR}/SmallStrings.cache`.
+- Lastly, replace all usages of `NSLocalizedString(key, comment)` with `SSTStringForKey(key)`.
