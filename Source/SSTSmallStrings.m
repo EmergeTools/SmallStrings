@@ -1,4 +1,5 @@
 #import "SSTSmallStrings.h"
+#include <Foundation/Foundation.h>
 #import <compression.h>
 
 static NSDictionary <NSString *, NSString *> *sKeyToString = nil;
@@ -17,25 +18,29 @@ NSData * SSTDecompressedDataForFile(NSURL *file)
     return [NSData dataWithBytesNoCopy:outBuffer length:actualSize freeWhenDone:YES];
 }
 
-id SSTJsonForName(NSString *name)
+id SSTJsonForName(NSString *name, NSBundle *bundle, NSString *subdirectory)
 {
-    NSURL *compressedFile = [[NSBundle mainBundle] URLForResource:name withExtension:nil subdirectory:@"localization"];
+    NSURL *compressedFile = [bundle URLForResource:name withExtension:nil subdirectory:subdirectory];
     NSData *data = SSTDecompressedDataForFile(compressedFile);
     return [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 }
 
-NSDictionary <NSString *, NSString *> *SSTCreateKeyToString()
+NSDictionary <NSString *, NSString *> *SSTCreateKeyToString(NSBundle *bundle, NSString *subdirectory, NSString *targetName)
 {
     // Note that the preferred list does seem to at least include the development region as a fallback if there aren't
     // any other languages
-    NSString *bestLocalization = [[[NSBundle mainBundle] preferredLocalizations] firstObject] ?: [[NSBundle mainBundle] developmentLocalization];
+    NSString *bestLocalization = [[bundle preferredLocalizations] firstObject] ?: [bundle developmentLocalization];
     if (!bestLocalization) {
         return @{};
     }
-    NSString *valuesPath = [NSString stringWithFormat:@"%@.values.json.lzfse", bestLocalization];
-    NSArray <id> *values = SSTJsonForName(valuesPath);
+    NSString *targetNamePrefix = @"";
+    if (targetName) {
+        targetNamePrefix = [NSString stringWithFormat:@"%@.", targetName];
+    }
+    NSString *valuesPath = [NSString stringWithFormat:@"%@%@.values.json.lzfse", targetNamePrefix, bestLocalization];
+    NSArray <id> *values = SSTJsonForName(valuesPath, bundle, subdirectory);
 
-    NSArray <NSString *> *keys = SSTJsonForName(@"keys.json.lzfse");
+    NSArray <NSString *> *keys = SSTJsonForName([NSString stringWithFormat:@"%@keys.json.lzfse", targetNamePrefix], bundle, subdirectory);
 
     NSMutableDictionary <NSString *, NSString *> *keyToString = [NSMutableDictionary dictionaryWithCapacity:keys.count];
     NSInteger count = keys.count;
@@ -50,13 +55,27 @@ NSDictionary <NSString *, NSString *> *SSTCreateKeyToString()
     return keyToString; // Avoid -copy to be a bit faster
 }
 
-NSString *SSTStringForKey(NSString *key)
-{
+NSString *SSTStringForKeyWithBundleAndSubdirectoryAndTargetName(NSString *key, NSBundle *bundle, NSString *subdirectory, NSString *targetName) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sKeyToString = SSTCreateKeyToString();
+        sKeyToString = SSTCreateKeyToString(bundle, subdirectory, targetName);
     });
     // Haven't tested with CFBundleAllowMixedLocalizations set to YES, although it seems like that'd be handled by the
     // NSLocalizedString fallback
     return sKeyToString[key] ?: NSLocalizedString(key, @"");
+}
+
+NSString *SSTStringForKeyWithBundleAndSubdirectory(NSString *key, NSBundle *bundle, NSString *subdirectory)
+{
+    return SSTStringForKeyWithBundleAndSubdirectoryAndTargetName(key, bundle, subdirectory, nil);
+}
+
+NSString *SSTStringForKeyWithBundle(NSString *key, NSBundle *bundle)
+{
+    return SSTStringForKeyWithBundleAndSubdirectoryAndTargetName(key, bundle, @"localization", nil);
+}
+
+NSString *SSTStringForKey(NSString *key)
+{
+    return SSTStringForKeyWithBundle(key, [NSBundle mainBundle]);
 }
