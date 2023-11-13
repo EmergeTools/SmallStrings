@@ -1,0 +1,49 @@
+objc_library(
+    name = "SSTSmallStrings",
+    srcs = [
+        "Source/SSTSmallStrings.m",
+    ],
+    hdrs = [
+        "Source/SSTSmallStrings.h",
+    ],
+    sdk_dylibs = [
+        "compression",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "compress",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":compress_lib",
+    ],
+)
+
+objc_library(
+    name = "compress_lib",
+    srcs = [
+        "compress.m",
+    ],
+    sdk_dylibs = [
+        "compression",
+    ],
+)
+
+cc_binary(
+    name = "localize",
+    data = [
+        ":compress",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":localize_lib",
+    ],
+)
+
+objc_library(
+    name = "localize_lib",
+    srcs = [
+        "localize.m",
+    ],
+)
