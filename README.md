@@ -3,6 +3,8 @@
 # SmallStrings | Reduce localized .strings file sizes by 80%
 #### Maintained by [Emerge Tools](https://emergetools.com?utm_source=smallstrings) 
 
+> 🧪 **Note**: This repo is meant as a proof-of-concept on how to reduce localization size. Adjustments may be needed for your specific project
+
 ### How does it work
 
 - Convert .strings files (of the form App.app/\*.lproj/Localizable.strings only) into a minified form
